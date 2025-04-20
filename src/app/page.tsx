@@ -1,103 +1,141 @@
-import Image from "next/image";
+'use client'
+import { useEffect,useState } from 'react'
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { EyeIcon, EyeOffIcon, LockIcon, UserIcon } from 'lucide-react'
+import { Helmet } from 'react-helmet'
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+import NewPassword from '@/components/NewPassword/NewPassword'
+import ButtonLoader from '@/components/common/form/buttonLoader/ButtonLoader'
+
+import useLogin from '@/hooks/useLogin'
+
+type LoginFormData = {
+  email: string
+  password: string
 }
+
+const Login = () => {    
+  //custom hook for handlLogin
+  const [loadLoginPage,setLoadLoginPage] = useState(false);
+  const {
+    handleLogin,
+    redirectLogin,
+    isTempPassword,
+    setShowPassword,
+    showPassword,
+    studentSlug,
+    register,
+    handleSubmit,
+    isLoading,
+    handleOnClickForForgotPassoword,
+  } = useLogin(setLoadLoginPage)
+  const onSubmit = (data: LoginFormData) => {
+    handleLogin(data) //? Handle login logic here
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
+  useEffect(() => {
+    redirectLogin();
+  }, [])
+  if(loadLoginPage){
+    return (
+      <>
+        <Helmet>
+          <title>Smart Roll | Login</title>
+        </Helmet>
+        {isTempPassword ? ( //? Render NewPassword component if isTempPassword is true
+          <NewPassword profile_slug={studentSlug} />
+        ) : (
+          <div className="flex h-[100dvh] flex-col">
+            <main className="flex h-[100dvh] items-center justify-center bg-white px-4 shadow-soft">
+              <div className="w-full max-w-md rounded-md bg-[#F7F7F7] p-8 text-black shadow-soft">
+                <div className="flex flex-col items-start">
+                  <h2 className="mb-2 text-center text-3xl font-bold">
+                    Welcome Back
+                  </h2>
+                  <h2 className="mb-6 text-center text-lg font-normal text-zinc-400">
+                    Login to SmartRoll
+                  </h2>
+                </div>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 transform text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        {...register('email', { required: true })}
+                        className="border-none pl-10 shadow-soft"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <LockIcon className="absolute left-3 top-1/2 -translate-y-1/2 transform text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Enter your password"
+                        {...register('password', { required: true })}
+                        className="border-none pl-10 pr-10 shadow-soft"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={togglePasswordVisibility}
+                        aria-label={
+                          showPassword ? 'Hide password' : 'Show password'
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <EyeIcon className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                    <div
+                      className="flex cursor-pointer justify-end text-sm text-zinc-400 hover:text-black hover:underline"
+                      onClick={() => {
+                        handleOnClickForForgotPassoword()
+                      }}
+                    >
+                      Forgot Password ?
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#0261BE] text-white hover:bg-[#0261BE]/70"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <ButtonLoader title="Logging In..." />
+                    ) : (
+                      "Login" // Directly render the text instead of wrapping in another button
+                    )}
+                  </Button>
+  
+                </form>
+              </div>
+            </main>
+          </div>
+        )}
+      </>
+    )
+  }
+}
+
+export default Login
